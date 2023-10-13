@@ -1,35 +1,42 @@
-import 'package:appcatering/food_service.dart';
+import 'package:appcatering/auth/chooseauth.dart';
+import 'package:appcatering/auth/login_screen.dart';
 import 'package:appcatering/homepage.dart';
-import 'package:appcatering/screens/account.dart';
-import 'package:appcatering/screens/home/home.dart';
-import 'package:appcatering/screens/home/home_page.dart';
-import 'package:appcatering/screens/home/widgets/body.dart';
-import 'package:appcatering/screens/home/widgets/item_pagi.dart';
-import 'package:appcatering/shopping_cart/cart.dart';
-import 'package:appcatering/screens/orderpage.dart';
-import 'package:appcatering/shopping_cart/widgets/body.dart';
-import 'package:appcatering/tabsorderpage/dropdown.dart';
-import 'package:appcatering/tabsorderpage/first_tab.dart';
-import 'package:appcatering/tabsorderpage/second_tab.dart';
-import 'package:appcatering/tabsorderpage/switchflutter.dart';
-import 'package:appcatering/tabsorderpage/test.dart';
-import 'package:appcatering/tabsorderpage/third_tab.dart';
-import 'package:appcatering/testapi.dart';
-
+import 'package:appcatering/hometest.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
-    ); //Material PageApp
+      home: FutureBuilder(
+        future: SharedPreferences.getInstance(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasData) {
+            final token = snapshot.data!.getString('token');
+            if (token != null) {
+              return HomePage();
+            } else {
+              return Login();
+            }
+          } else {
+            return const Center(
+              child: Text('Error'),
+            );
+          }
+        },
+      ),
+    );
   }
 }
