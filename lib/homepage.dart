@@ -1,4 +1,4 @@
-import 'package:appcatering/screens/account.dart';
+import 'package:appcatering/screens/profilepage/account.dart';
 import 'package:appcatering/screens/home/home_page.dart';
 import 'package:appcatering/screens/home/widgets/body.dart';
 import 'package:appcatering/shopping_cart/cart.dart';

@@ -14,7 +14,7 @@ Color secondaryColor = HexColor('#1F7879');
 Color secondaryTextColor = HexColor('#658E92');
 
 // API Url
-String apiUrl = 'http://10.254.127.244:8000/api';
+String apiUrl = 'http://10.254.127.206:8000/api';
 
 spancer({
   double w = 0,

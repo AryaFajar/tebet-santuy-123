@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:appcatering/auth/register_screen.dart';
 import 'package:appcatering/homepage.dart';
+import 'package:appcatering/screens/anaklist.dart';
 import 'package:appcatering/widget/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,9 +29,10 @@ class _LoginState extends State<Login> {
     if (response['status'] == 200) {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       await preferences.setInt('customer_id', response['user']['id']);
-      await preferences.setString('nama', response['user']['nama']);
+      await preferences.setString('name', response['user']['name']);
       await preferences.setString('email', response['user']['email']);
       await preferences.setString('image', response['user']['image']);
+      await preferences.setString('balance', response['user']['balance']);
       await preferences.setString('token', response['token']);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -39,7 +41,22 @@ class _LoginState extends State<Login> {
       );
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) =>
+              AnakListPage(customerId: response['user']['id']),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            response['message'],
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center, // Center-align the text
+          ),
+          backgroundColor: Colors.red,
         ),
       );
     }

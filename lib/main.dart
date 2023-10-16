@@ -2,6 +2,7 @@ import 'package:appcatering/auth/chooseauth.dart';
 import 'package:appcatering/auth/login_screen.dart';
 import 'package:appcatering/homepage.dart';
 import 'package:appcatering/hometest.dart';
+import 'package:appcatering/screens/orderpage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

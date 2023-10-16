@@ -1,5 +1,7 @@
 import 'package:appcatering/auth/login_screen.dart';
+import 'package:appcatering/screens/profilepage/updateprofile.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:appcatering/screens/topup.dart';
 import 'package:appcatering/screens/helpandsupport.dart';
@@ -13,38 +15,74 @@ class UserAccount extends StatefulWidget {
 
 class _UserAccountState extends State<UserAccount> {
   late SharedPreferences preferences;
-  bool isLoading = false;
+  bool isLoading = true;
+  String? userName;
+  String? userImage;
+  String? userBalance;
+  late int userId;
 
+  @override
   void initState() {
     super.initState();
-    initializePreferences();
-
     getUserData();
   }
 
-  void initializePreferences() async {
+  Future<void> getUserData() async {
     preferences = await SharedPreferences.getInstance();
-  }
+    final storedUserId = preferences.getInt('customer_id');
+    print(storedUserId);
+    final storedName = preferences.getString('name');
+    final storedImage = preferences.getString('image');
+    final storedBalance = preferences.getString('balance');
 
-  void getUserData() async {
-    setState(() {
-      isLoading = true;
-    });
-    preferences = await SharedPreferences.getInstance();
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  void logout() {
-    if (preferences != null) {
-      preferences!.clear();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
-      );
+    if (storedUserId != null && storedName != null) {
+      setState(() {
+        isLoading = false;
+        userId = storedUserId;
+        userName = storedName;
+        userImage = storedImage;
+        userBalance = storedBalance;
+      });
     }
+  }
+
+  void handleProfileUpdated() {
+    getUserData(); // Perbarui data profil saat profil diperbarui
+  }
+
+  void showLogoutConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Logout'),
+          content: Text('Yakin ingin logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                doLogout(); // Panggil fungsi logout
+              },
+              child: Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void doLogout() {
+    preferences.clear();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => Login(),
+      ),
+    );
   }
 
   @override
@@ -89,20 +127,60 @@ class _UserAccountState extends State<UserAccount> {
                         border: Border.all(color: Colors.grey),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.network(
-                            preferences.getString('image') ?? '',
-                            width: 100, // Atur lebar gambar sesuai kebutuhan
-                            height: 100,
-                          ),
-                          SizedBox(width: 16),
-                          Text(
-                            'Name: ${preferences.getString('nama').toString()}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundImage: NetworkImage(
+                                  userImage ??
+                                      'https://cdn-icons-png.flaticon.com/512/1144/1144760.png',
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 12.0),
+                                      child: Text(
+                                        userName ?? 'User',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        height:
+                                            8), // Spasi antara teks nama dan "Edit Profile"
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => EditProfile(
+                                              userId: userId,
+                                              onProfileUpdated:
+                                                  handleProfileUpdated,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Edit Profile',
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -126,7 +204,7 @@ class _UserAccountState extends State<UserAccount> {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                '1000 Points', // Gantilah dengan data points pengguna
+                                '$userBalance balance',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -173,8 +251,43 @@ class _UserAccountState extends State<UserAccount> {
                           ),
                           InkWell(
                             onTap: () {
-                              logout();
+                              showLogoutConfirmationDialog();
                             },
+                            child: Icon(
+                              Icons.arrow_right,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.history,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'History Pemesanan',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          InkWell(
+                            // onTap: () {
+                            //   logout();
+                            // },
                             child: Icon(
                               Icons.arrow_right,
                               color: Colors.black,

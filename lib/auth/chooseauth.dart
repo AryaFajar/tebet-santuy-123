@@ -34,22 +34,13 @@ class PilihCaraMasuk extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      final hasSeenWelcome =
-                          prefs.getBool('has_seen_welcome') ?? false;
-                      if (hasSeenWelcome) {
-                        final token = prefs.getString('token');
-                        if (token != null) {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) => HomePage()));
-                        } else {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (context) => Login()));
-                        }
-                      } else {
-                        prefs.setBool('has_seen_welcome', true);
+                      final token = prefs.getString('token');
+                      if (token != null) {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => PilihCaraMasuk()));
+                            builder: (context) => HomePage()));
+                      } else {
+                        Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => Login()));
                       }
                     },
                     child: Text('Login'),

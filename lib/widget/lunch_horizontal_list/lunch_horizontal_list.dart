@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:appcatering/widget/custom_horizontal_list/horizontal_list_header.dart';
-import 'package:equatable/equatable.dart';
+// import 'package:equatable/equatable.dart';
 import 'package:async/async.dart';
 
 import 'dart:convert';
@@ -27,7 +27,7 @@ class _LunchHorizontalListState extends State<LunchHorizontalList> {
   Future<List<Menu>> fetchMenuData(DateTime selectedDate) async {
     try {
       final response =
-          await http.get(Uri.parse("http://10.254.127.244:8000/api/menu"));
+          await http.get(Uri.parse("http://10.254.127.206:8000/api/menu"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         print(response.body);
