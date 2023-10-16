@@ -25,13 +25,13 @@ class _AnakListPageState extends State<AnakListPage> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     int customerId = preferences.getInt('customer_id') ??
         0; // Get the customer ID from preferences
-
     final result =
-        await API().getRequest(route: '/anak?customer_id=$customerId');
-    final data = jsonDecode(result.body)['anak'];
+        await API().getRequest(route: '/anak?customerid=$customerId');
 
+    // Parse the JSON response and update anakList
+    final List<dynamic> decodedList = jsonDecode(result.body);
     setState(() {
-      anakList = List<Map<String, dynamic>>.from(data);
+      anakList = decodedList.cast<Map<String, dynamic>>();
     });
   }
 
@@ -48,7 +48,7 @@ class _AnakListPageState extends State<AnakListPage> {
           return ListTile(
             title: Text(anak['nama_anak']),
             subtitle: Text(anak['kelas']),
-            // Anda dapat menambahkan tampilan lain sesuai kebutuhan
+            // You can add other UI elements as needed
           );
         },
       ),
