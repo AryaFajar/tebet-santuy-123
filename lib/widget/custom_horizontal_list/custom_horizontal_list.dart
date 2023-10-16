@@ -26,8 +26,8 @@ class _CustomHorizontalListState extends State<CustomHorizontalList> {
 
   Future<List<Menu>> fetchMenuData(DateTime selectedDate) async {
     try {
-      final response =
-          await http.get(Uri.parse("http://10.254.127.206:8000/api/menu"));
+      final response = await http
+          .get(Uri.parse("https://ea81-180-251-181-5.ngrok-free.app/api/menu"));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         print(response.body);
