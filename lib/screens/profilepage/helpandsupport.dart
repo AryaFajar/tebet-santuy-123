@@ -144,10 +144,3 @@ class HelpSupport extends StatelessWidget {
     );
   }
 }
-
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    home: HelpSupport(),
-  ));
-}

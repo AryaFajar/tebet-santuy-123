@@ -28,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
     };
 
     final result = await API().postRequest(
-      route: '/customer/update${widget.userId}',
+      route: '/customer/update/${widget.userId}',
       data: data,
     );
     final response = jsonDecode(result.body);
@@ -67,29 +67,49 @@ class _EditProfileState extends State<EditProfile> {
       appBar: AppBar(
         title: Text('Edit Profile'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            InputField(
-              controller: nameController,
-              hintText: 'Nama Baru',
+      body: Column(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  InputField(
+                    controller: nameController,
+                    hintText: 'Nama Baru',
+                  ),
+                  InputField(
+                    controller: passwordController,
+                    hintText: 'Kata Sandi Baru',
+                    isObscure: true,
+                  ),
+                  // Tambahkan input field dan widget lain sesuai kebutuhan
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      updateProfile();
+                    },
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.black),
+                        padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                          vertical: 15,
+                          horizontal: 20,
+                        )),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20)))),
+                    child: Text(
+                      "Perbarui Profile",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            InputField(
-              controller: passwordController,
-              hintText: 'Kata Sandi Baru',
-              isObscure: true,
-            ),
-            // Tambahkan input field dan widget lain sesuai kebutuhan
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                updateProfile();
-              },
-              child: Text('Simpan Perubahan'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

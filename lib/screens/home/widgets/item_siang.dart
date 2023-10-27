@@ -1,4 +1,4 @@
-import 'package:appcatering/widget/custom_horizontal_list/custom_horizontal_list.dart';
+import 'package:appcatering/widget/horizontal_list.dart';
 import 'package:appcatering/widget/lunch_horizontal_list/lunch_horizontal_list.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +9,9 @@ class ItemSiang extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LunchHorizontalList(
+    return HorizontalList(
       title: 'Makan Siang',
+      category: 2,
       selectedDate: selectedDate,
     );
   }

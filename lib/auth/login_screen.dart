@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:appcatering/auth/register_screen.dart';
 import 'package:appcatering/homepage.dart';
 import 'package:appcatering/screens/anaklist.dart';
+import 'package:appcatering/screens/home/home_page.dart';
+import 'package:appcatering/tabsorderpage/testdataapi.dart';
 import 'package:appcatering/widget/input_field.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,18 +33,27 @@ class _LoginState extends State<Login> {
       await preferences.setInt('customer_id', response['user']['id']);
       await preferences.setString('name', response['user']['name']);
       await preferences.setString('email', response['user']['email']);
-      await preferences.setString('image', response['user']['image']);
-      await preferences.setString('balance', response['user']['balance']);
+      if (response['user']['image'] != null) {
+        await preferences.setString('image', response['user']['image']);
+      }
+
+      if (response['user']['balance'] != null) {
+        await preferences.setInt('balance', response['user']['balance']);
+      }
+
       await preferences.setString('token', response['token']);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(response['message']),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message']),
+          ),
+        );
+      }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) =>
-              AnakListPage(customerId: response['user']['id']),
+              // AnakListPage(customerId: response['user']['id']),
+              HomePage(),
         ),
       );
     } else {
@@ -112,7 +123,7 @@ class _LoginState extends State<Login> {
                     child: Container(
                       padding: EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple,
+                        color: Colors.black,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Center(

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 class HorizontalListHeader extends StatelessWidget {
   final String title;
+  final VoidCallback? onShowAllPressed;
 
   const HorizontalListHeader({
+    this.onShowAllPressed,
     required this.title,
     super.key,
   });
@@ -29,21 +31,24 @@ class HorizontalListHeader extends StatelessWidget {
   }
 
   Widget buildShowAllButton() {
-    return Row(
-      children: [
-        Text(
-          'Lihat Semua',
-          style: TextStyle(
-            fontWeight: FontWeight.normal,
-            fontSize: 18,
+    return GestureDetector(
+      onTap: onShowAllPressed, // Memanggil callback onShowAllPressed
+      child: Row(
+        children: [
+          Text(
+            'Lihat Semua',
+            style: TextStyle(
+              fontWeight: FontWeight.normal,
+              fontSize: 18,
+            ),
           ),
-        ),
-        const SizedBox(height: 5),
-        Image.asset(
-          'assets/images/right_arrow.png',
-          width: 15,
-        )
-      ],
+          const SizedBox(width: 5),
+          Image.asset(
+            'assets/images/right_arrow.png',
+            width: 15,
+          ),
+        ],
+      ),
     );
   }
 }

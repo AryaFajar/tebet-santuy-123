@@ -3,10 +3,14 @@ import 'package:appcatering/screens/home/home_page.dart';
 import 'package:appcatering/screens/home/widgets/body.dart';
 import 'package:appcatering/shopping_cart/cart.dart';
 import 'package:appcatering/screens/home/home.dart';
+import 'package:appcatering/shopping_cart/widgets/shopping_cart_empty.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 void main() => runApp(MaterialApp(
+      debugShowCheckedModeBanner:
+          false, // Add this line to remove the debug label
+
       builder: (context, child) {
         return Directionality(textDirection: TextDirection.ltr, child: child!);
       },
@@ -25,8 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _NavScreens = <Widget>[
     const HomePengguna(),
-    const UserCart(),
-    const UserAccount()
+    const UserAccount(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -48,10 +51,6 @@ class _HomePageState extends State<HomePage> {
               GButton(
                 icon: Icons.home,
                 text: 'Home',
-              ),
-              GButton(
-                icon: Icons.shopping_cart,
-                text: 'Keranjang',
               ),
               GButton(
                 icon: Icons.account_circle,

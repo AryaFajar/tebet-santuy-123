@@ -66,7 +66,7 @@ class _RegisterState extends State<Register> {
               ),
               SizedBox(height: 50),
               InputField(
-                  controller: username, hintText: 'Masukkan e Lengkap Anda'),
+                  controller: username, hintText: 'Masukkan Nama Lengkap Anda'),
               SizedBox(height: 20),
               InputField(
                 controller: email,
@@ -90,7 +90,7 @@ class _RegisterState extends State<Register> {
                   child: Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple,
+                      color: Colors.black,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(

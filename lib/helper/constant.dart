@@ -14,7 +14,7 @@ Color secondaryColor = HexColor('#1F7879');
 Color secondaryTextColor = HexColor('#658E92');
 
 // API Url
-String apiUrl = 'https://ea81-180-251-181-5.ngrok-free.app/api';
+String apiUrl = 'https://07b2-180-245-55-3.ngrok-free.app/api';
 
 spancer({
   double w = 0,

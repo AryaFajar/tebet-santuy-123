@@ -10,7 +10,7 @@ import 'package:appcatering/screens/home/widgets/pilihtanggal.dart';
 // import 'package:intl/intl.dart';
 
 class BodyPengguna extends StatefulWidget {
-  const BodyPengguna({Key? key}) : super(key: key);
+  const BodyPengguna({super.key});
 
   @override
   _BodyPenggunaState createState() => _BodyPenggunaState();
@@ -29,24 +29,27 @@ class _BodyPenggunaState extends State<BodyPengguna> {
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            HomeHeader(),
-            const SizedBox(height: 20),
-            PilihTanggal(
-              onDateSelected: (date) {
-                setState(() {
-                  selectedDate = date;
-                });
-              },
+      child: Column(
+        children: [
+          HomeHeader(),
+          PilihTanggal(
+            onDateSelected: (date) {
+              setState(() {
+                selectedDate = date;
+              });
+            },
+          ),
+          Expanded(
+            child: ListView(
+              children: [
+                SizedBox(height: 20),
+                ItemPagi(selectedDate: selectedDate),
+                SizedBox(height: 20),
+                ItemSiang(selectedDate: selectedDate),
+              ],
             ),
-            const SizedBox(height: 20),
-            ItemPagi(selectedDate: selectedDate),
-            const SizedBox(height: 20),
-            ItemSiang(selectedDate: selectedDate),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

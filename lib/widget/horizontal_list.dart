@@ -1,48 +1,65 @@
+import 'package:appcatering/helper/constant.dart';
+import 'package:appcatering/widget/custom_vertical_list/seeallpage.dart';
+import 'package:appcatering/tabsorderpage/mainorderpage/orderpage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:appcatering/widget/custom_horizontal_list/horizontal_list_header.dart';
-// import 'package:equatable/equatable.dart';
 import 'package:async/async.dart';
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class CustomHorizontalList extends StatefulWidget {
+class HorizontalList extends StatefulWidget {
   final String title;
+  final int category;
   final DateTime selectedDate;
+  final bool showAll;
+  final bool showHeader; // Tambahkan parameter ini
 
-  const CustomHorizontalList({
+  HorizontalList({
     Key? key,
     required this.title,
+    required this.category,
     required this.selectedDate,
+    this.showAll = false,
+    this.showHeader = true, // Set defaultnya menjadi true
   }) : super(key: key);
 
   @override
-  _CustomHorizontalListState createState() => _CustomHorizontalListState();
+  _HorizontalListState createState() => _HorizontalListState();
 }
 
-class _CustomHorizontalListState extends State<CustomHorizontalList> {
+class _HorizontalListState extends State<HorizontalList> {
   final memoizer = AsyncMemoizer<List<Menu>>();
 
-  Future<List<Menu>> fetchMenuData(DateTime selectedDate) async {
+  Future<List<Menu>> fetchMenuData() async {
     try {
-      final response = await http
-          .get(Uri.parse("https://ea81-180-251-181-5.ngrok-free.app/api/menu"));
+      final response = await http.get(Uri.parse('$apiUrl/menu'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         print(response.body);
 
-        final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+        final formattedDate =
+            DateFormat('yyyy-MM-dd').format(widget.selectedDate);
         print("Formatted Date: $formattedDate");
 
         final List<dynamic> menuList = data['menu'];
-        final List<Menu> filteredData = menuList
+        List<Menu> filteredData = menuList
             .where((menu) =>
-                menu['category_id'] == 1 && menu['tanggal'] == formattedDate)
+                menu['category_id'] == widget.category &&
+                menu['tanggal'] == formattedDate)
             .map((json) => Menu.fromJson(json))
             .toList();
 
-        return filteredData;
+        // Cek apakah kita ingin menampilkan semua item atau hanya 3 item
+        if (widget.showAll) {
+          // Jika di halaman 'SeeAllPage', tampilkan semua item
+          return filteredData;
+        } else {
+          // Jika di halaman lain, batasi jumlah item yang ditampilkan menjadi 3
+          filteredData = filteredData.take(3).toList();
+          return filteredData;
+        }
       } else {
         print('Failed to load menu data - ${response.statusCode}');
         return []; // Return an empty list to indicate no data available
@@ -56,17 +73,34 @@ class _CustomHorizontalListState extends State<CustomHorizontalList> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Menu>>(
-      future: fetchMenuData(widget.selectedDate), // Pass the selectedDate here
+      future: fetchMenuData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(
+            child: CircularProgressIndicator(),
+          );
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           if (snapshot.data!.isEmpty) {
             return Column(
               children: [
-                HorizontalListHeader(title: widget.title),
+                if (widget.showHeader)
+                  HorizontalListHeader(
+                    title: widget.title,
+                    onShowAllPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SeeAllPage(
+                            categoryTitle: widget.title,
+                            category: widget.category,
+                            selectedDate: widget.selectedDate,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 const SizedBox(height: 10),
                 Text('No data available'),
               ],
@@ -74,9 +108,24 @@ class _CustomHorizontalListState extends State<CustomHorizontalList> {
           } else {
             return Column(
               children: [
-                HorizontalListHeader(title: widget.title),
+                if (widget.showHeader)
+                  HorizontalListHeader(
+                    title: widget.title,
+                    onShowAllPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SeeAllPage(
+                            categoryTitle: widget.title,
+                            category: widget.category,
+                            selectedDate: widget.selectedDate,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 const SizedBox(height: 10),
-                CustomHorizontalListBody(
+                HorizontalListBody(
                   menuData: snapshot.data!,
                 ),
               ],
@@ -99,40 +148,28 @@ class _CustomHorizontalListState extends State<CustomHorizontalList> {
 class Menu {
   final String name;
   final String image;
-  final String price;
+  final int price;
+  final String description;
+  final DateTime tanggal;
+  final int category;
 
   Menu({
     required this.name,
     required this.image,
     required this.price,
+    required this.description,
+    required this.tanggal,
+    required this.category,
   });
 
   factory Menu.fromJson(Map<String, dynamic> json) {
     return Menu(
       name: json['nama_menu'],
       image: json['gambar'],
-      price: json['harga'],
-    );
-  }
-}
-
-class CustomHorizontalListBody extends StatelessWidget {
-  final List<Menu> menuData;
-
-  CustomHorizontalListBody({
-    required this.menuData,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-          HorizontalListBody(menuData: menuData),
-        ],
-      ),
+      price: json['harga'] as int,
+      description: json['deskripsi'],
+      tanggal: DateTime.parse(json['tanggal']),
+      category: json['category_id'] as int,
     );
   }
 }
@@ -149,6 +186,7 @@ class HorizontalListBody extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 15,
+          horizontal: 10,
         ),
         child: Row(
           children:
@@ -164,11 +202,27 @@ class HorizontalListItem extends StatelessWidget {
 
   HorizontalListItem({required this.menu});
 
+  void navigateToOrderPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderPage(
+          MenuName: menu.name,
+          price: menu.price,
+          imageUrl: menu.image,
+          description: menu.description,
+          tanggal: menu.tanggal,
+          category: menu.category,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Tindakan yang ingin Anda lakukan ketika item diklik
+        navigateToOrderPage(context);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -210,7 +264,7 @@ class HorizontalListItem extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '\P${menu.price}',
+                        '\P${menu.price.toString()}',
                         style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontSize: 14), // Mengurangi ukuran teks harga

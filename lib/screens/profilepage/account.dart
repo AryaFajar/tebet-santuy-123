@@ -1,10 +1,11 @@
 import 'package:appcatering/auth/login_screen.dart';
+import 'package:appcatering/screens/profilepage/history_order.dart';
 import 'package:appcatering/screens/profilepage/updateprofile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:appcatering/screens/topup.dart';
-import 'package:appcatering/screens/helpandsupport.dart';
+import 'package:appcatering/screens/profilepage/topup.dart';
+import 'package:appcatering/screens/profilepage/helpandsupport.dart';
 
 class UserAccount extends StatefulWidget {
   const UserAccount({super.key});
@@ -18,7 +19,7 @@ class _UserAccountState extends State<UserAccount> {
   bool isLoading = true;
   String? userName;
   String? userImage;
-  String? userBalance;
+  int? userBalance;
   late int userId;
 
   @override
@@ -27,13 +28,19 @@ class _UserAccountState extends State<UserAccount> {
     getUserData();
   }
 
+  void _updateBalance(int newBalance) {
+    setState(() {
+      userBalance = newBalance;
+    });
+  }
+
   Future<void> getUserData() async {
     preferences = await SharedPreferences.getInstance();
     final storedUserId = preferences.getInt('customer_id');
     print(storedUserId);
     final storedName = preferences.getString('name');
     final storedImage = preferences.getString('image');
-    final storedBalance = preferences.getString('balance');
+    final storedBalance = preferences.getInt('balance');
 
     if (storedUserId != null && storedName != null) {
       setState(() {
@@ -78,11 +85,13 @@ class _UserAccountState extends State<UserAccount> {
 
   void doLogout() {
     preferences.clear();
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => Login(),
-      ),
-    );
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+    }
   }
 
   @override
@@ -98,295 +107,315 @@ class _UserAccountState extends State<UserAccount> {
           ),
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      body: SafeArea(
-        child: isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // User Profile Box
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 50,
-                                backgroundImage: NetworkImage(
-                                  userImage ??
-                                      'https://cdn-icons-png.flaticon.com/512/1144/1144760.png',
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // User Profile Box
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 50,
+                                  backgroundImage: NetworkImage(
+                                    userImage ??
+                                        'https://cdn-icons-png.flaticon.com/512/1144/1144760.png',
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 12.0),
-                                      child: Text(
-                                        userName ?? 'User',
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        height:
-                                            8), // Spasi antara teks nama dan "Edit Profile"
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => EditProfile(
-                                              userId: userId,
-                                              onProfileUpdated:
-                                                  handleProfileUpdated,
-                                            ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 12.0),
+                                        child: Text(
+                                          userName ?? 'User',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        );
-                                      },
-                                      child: Text(
-                                        'Edit Profile',
-                                        style: TextStyle(
-                                          color: Colors.blue,
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(
+                                          height:
+                                              8), // Spasi antara teks nama dan "Edit Profile"
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) => EditProfile(
+                                                userId: userId,
+                                                onProfileUpdated:
+                                                    handleProfileUpdated,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'Edit Profile',
+                                          style: TextStyle(
+                                            color: Colors.blue,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.all(14.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.monetization_on,
+                                  color: Colors.green,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '${userBalance ?? 0} P',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TopUp(),
+                                  ),
+                                ).then((result) {
+                                  if (result != null && result is int) {
+                                    // Handle saldo yang diupdate dari halaman Top Up
+                                    _updateBalance(result);
+                                  }
+                                });
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(Colors.black),
+                                padding: MaterialStateProperty.all(
+                                  EdgeInsets.symmetric(
+                                    vertical: 15,
+                                    horizontal: 20,
+                                  ),
+                                ),
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
+                              child: const Text('Top Up',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(14.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.monetization_on,
-                                color: Colors.green,
-                                size: 30,
-                              ),
-                              SizedBox(width: 8),
-                              Text(
-                                '$userBalance balance',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.logout,
+                                  color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const TopUp(),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Log Out',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              );
-                            },
-                            child: const Text('Top Up'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.logout,
+                              ],
+                            ),
+                            InkWell(
+                              onTap: () {
+                                showLogoutConfirmationDialog();
+                              },
+                              child: Icon(
+                                Icons.arrow_right,
                                 color: Colors.black,
-                                size: 30,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Log Out',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            onTap: () {
-                              showLogoutConfirmationDialog();
-                            },
-                            child: Icon(
-                              Icons.arrow_right,
-                              color: Colors.black,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.history,
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.history,
+                                  color: Colors.black,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'History Pemesanan',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => OrderHistory(),
+                                  ),
+                                );
+                              },
+                              child: Icon(
+                                Icons.arrow_right,
                                 color: Colors.black,
-                                size: 30,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'History Pemesanan',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 28),
+                      Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Lainnya',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.question_answer,
+                                  color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
-                          ),
-                          InkWell(
-                            // onTap: () {
-                            //   logout();
-                            // },
-                            child: Icon(
-                              Icons.arrow_right,
-                              color: Colors.black,
+                                SizedBox(width: 8),
+                                Text(
+                                  'Bantuan dan Dukungan',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 28),
-                    Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Lainnya',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.question_answer,
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_right,
                                 color: Colors.black,
-                                size: 30,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Bantuan dan Dukungan',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_right,
-                              color: Colors.black,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const HelpSupport(),
+                                  ),
+                                );
+                              },
                             ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HelpSupport(),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.info,
+                      Container(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.info,
+                                  color: Colors.black,
+                                  size: 30,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Tentang Aplikasi',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_right,
                                 color: Colors.black,
-                                size: 30,
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Tentang Aplikasi',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.arrow_right,
-                              color: Colors.black,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
                             ),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

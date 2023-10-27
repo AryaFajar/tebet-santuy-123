@@ -1,4 +1,4 @@
-import 'package:appcatering/widget/custom_horizontal_list/custom_horizontal_list.dart';
+import 'package:appcatering/widget/horizontal_list.dart';
 import 'package:flutter/material.dart';
 
 class ItemPagi extends StatelessWidget {
@@ -8,8 +8,9 @@ class ItemPagi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomHorizontalList(
+    return HorizontalList(
       title: 'Snack Pagi',
+      category: 1,
       selectedDate: selectedDate,
     );
   }

@@ -11,6 +11,8 @@ class PilihTanggal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final DateTime sevenDaysFromNow = DateTime.now().add(Duration(days: 7));
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: DatePicker(
@@ -20,18 +22,21 @@ class PilihTanggal extends StatelessWidget {
         initialSelectedDate: DateTime.now(),
         selectionColor: Colors.black,
         selectedTextColor: Colors.white,
+
         dateTextStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: Colors.grey,
         ),
-        onDateChange: (date) {
-          // Format DateTime to a String in 'yyyy-MM-dd' format
-          final formattedDate = formatDate(date, [yyyy, '-', mm, '-', dd]);
-          print(formattedDate); // Print the formatted date
+        daysCount: 7, // Menampilkan tanggal hanya 20 hari ke depan
 
-          // You can choose to pass the formatted string or keep it as DateTime
-          onDateSelected(date);
+        onDateChange: (date) {
+          if (date.weekday >= DateTime.monday &&
+              date.weekday <= DateTime.friday) {
+            final formattedDate = formatDate(date, [yyyy, '-', mm, '-', dd]);
+            print(formattedDate);
+            onDateSelected(date);
+          } else {}
         },
       ),
     );
